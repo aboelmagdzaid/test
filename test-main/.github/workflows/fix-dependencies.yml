@@ -1,0 +1,39 @@
+name: Fix Dependencies & Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Clean node_modules and lock file
+        run: |
+          rm -rf node_modules package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: List dependencies (optional check)
+        run: npm list --depth=0
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts (optional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+    const supabase = createClient(
+      "https://YOUR-PROJECT.supabase.co",
+      "YOUR-PUBLIC-ANON-KEY"
+    );
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      let { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        alert("Login failed: " + error.message);
+      } else {
+        // بعد تسجيل الدخول، نجيب بيانات اليوزر من جدول users
+        let { data: userData } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+
+        if (userData.role === "admin") {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "user.html";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
